@@ -12,6 +12,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
+using web_api.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace web_api
 {
     public class Startup
@@ -28,6 +31,10 @@ namespace web_api
         {
 
             services.AddControllers();
+
+            services.AddDbContext<AppDBContext>(options => 
+                options.UseSqlite(Configuration.GetConnectionString("AppDBContext")));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "web_api", Version = "v1" });
