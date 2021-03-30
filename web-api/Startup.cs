@@ -61,6 +61,9 @@ namespace web_api
             {
                 endpoints.MapControllers();
             });
+
+            // Seed the database. 
+            AppDBInitializer.Seed(app);
         }
     }
 }
