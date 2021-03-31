@@ -26,74 +26,106 @@ namespace web_api.Controllers
 
         // GET: api/Song
         // Returns all the songs from the DB by HTTP Get.
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Song>>> GetSong()
-        {
-            return await _DBContext.Songs.ToListAsync();
-        }
+        // [HttpGet]
+        // public async Task<ActionResult<IEnumerable<Song>>> GetSong()
+        // {
+        //     // TODO: does not return the publisher name and artist names
+        //     return await _DBContext.Songs.ToListAsync();
+        // }
 
         // GET: api/Song/5
-        // Returns a single song by the given Id by HTTP Get.  
+        // Returns a single song by the given id by HTTP Get.  
         [HttpGet("{id}")]
-        public async Task<ActionResult<Song>> GetSong(int id)
+        public async Task<ActionResult<SongWithArtists>> GetSong(int id)
         {
-            var song = await _DBContext.Songs.FindAsync(id);
-
-            if (song == null)
+            var _songWithArtist = await _DBContext.Songs
+                .Where(n => n.Id == id).Select(song => new SongWithArtists()
             {
-                return NotFound();
-            }
+                Title = song.Title,
+                ReleaseDate = song.ReleaseDate,
+                Genre = song.Genre,
+                PublisherName = song.Publisher.Name,
+                ArtistNames = song.Song_Artists.Select(n => n.Artist.Name).ToList()
+            }).FirstOrDefaultAsync();
 
-            return song;
+            return _songWithArtist;
         }
 
         // PUT: api/Song/5
         // Updates an existing book in the DB if exists. 
         // The URI Id must match the Song-object Id. 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSong(int id, Song song)
-        {
-            if (id != song.Id)
-            {
-                return BadRequest();
-            }
+        // [HttpPut("{id}")]
+        // public async Task<IActionResult> PutSong(int id, [FromBody] SongViewModel songVM)
+        // {
+        //     var _song = new Song()
+        //     {
+        //         Title = songVM.Title,
+        //         ReleaseDate = songVM.ReleaseDate,
+        //         Genre = songVM.Genre,
+        //         PublisherId = songVM.PublisherId
+        //     };
 
-            _DBContext.Entry(song).State = EntityState.Modified;
+        //     // TODO: What about the Artists IDs ??  
 
-            try
-            {
-                await _DBContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SongExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //     _DBContext.Entry(_song).State = EntityState.Modified;
 
-            return NoContent();
-        }
+        //     try
+        //     {
+        //         await _DBContext.SaveChangesAsync();
+        //     }
+        //     catch (DbUpdateConcurrencyException)
+        //     {
+        //         if (!SongExists(id))
+        //         {
+        //             return NotFound();
+        //         }
+        //         else
+        //         {
+        //             throw;
+        //         }
+        //     }
+
+        //     return NoContent();
+        // }
 
         // POST: api/Song
         // Will add a new song to the database. 
         // When creating a Song-object, the Id prop should be set 
         // to 0 or left as null. 
         [HttpPost]
-        public async Task<ActionResult<Song>> PostSong(Song song)
+        public async Task<ActionResult<Song>> PostSong([FromBody] SongViewModel songVM)
         {
-            _DBContext.Songs.Add(song); 
+            // Add the song to the Song-table with data from songVM
+            var _song = new Song()
+            {
+                Title = songVM.Title,
+                ReleaseDate = songVM.ReleaseDate,
+                Genre = songVM.Genre,
+                PublisherId = songVM.PublisherId
+            };
+
+            _DBContext.Songs.Add(_song); 
             await _DBContext.SaveChangesAsync(); 
 
+            // After saving the new song, add all artists-relations
+            // for the song into the Artists-table. 
+            foreach(var id in songVM.ArtistsIds)
+            {
+                var _song_artist = new Song_Artist()
+                {
+                    SongId = _song.Id,
+                    ArtistId = id
+                };
+
+                _DBContext.Songs_Artists.Add(_song_artist); 
+                await _DBContext.SaveChangesAsync(); 
+            }
+
             // HTTP Response?
-            return CreatedAtAction("GetSong", new { id = song.Id }, song);
+            return CreatedAtAction("GetSong", new { id = _song.Id }, _song);
         }
 
-        // DELETE: api/Song/5
+        //DELETE: api/Song/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSong(int id)
         {

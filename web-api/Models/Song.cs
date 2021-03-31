@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace web_api.Models
 {
+    // Class that represents an Entity in the Database.
     public class Song
     {
         public int Id { get; set; }

@@ -35,6 +35,14 @@ namespace web_api
             services.AddDbContext<AppDBContext>(options => 
                 options.UseSqlite(Configuration.GetConnectionString("AppDBContext")));
 
+            // Ignore Reference loops error (something that happend with Song insert
+            // after adding relation to Publisher and Artist table. Works as expected though). 
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "web_api", Version = "v1" });
