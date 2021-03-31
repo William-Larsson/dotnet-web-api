@@ -63,7 +63,7 @@ namespace web_api
             });
 
             // Seed the database. 
-            AppDBInitializer.Seed(app);
+            // AppDBInitializer.Seed(app);
         }
     }
 }

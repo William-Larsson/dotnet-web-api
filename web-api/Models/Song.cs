@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace web_api.Models
@@ -14,8 +15,10 @@ namespace web_api.Models
 
         // Navigation props.
         // Used to define the relationship between models.E
-        // A song as a single publisher
+        // A song has a single (or no) publisher, as well 
+        // as one or many artist. 
         public int? PublisherId { get; set; }  // Foreign key (optional, songs can have no publisher)
         public Publisher Publisher { get; set; }
+        public List<Song_Artist> Song_Artists { get; set; }
     }
 }

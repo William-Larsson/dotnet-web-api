@@ -29,7 +29,7 @@ namespace web_api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Song>>> GetSong()
         {
-            return await _DBContext.Song.ToListAsync();
+            return await _DBContext.Songs.ToListAsync();
         }
 
         // GET: api/Song/5
@@ -37,7 +37,7 @@ namespace web_api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Song>> GetSong(int id)
         {
-            var song = await _DBContext.Song.FindAsync(id);
+            var song = await _DBContext.Songs.FindAsync(id);
 
             if (song == null)
             {
@@ -86,7 +86,7 @@ namespace web_api.Controllers
         [HttpPost]
         public async Task<ActionResult<Song>> PostSong(Song song)
         {
-            _DBContext.Song.Add(song); 
+            _DBContext.Songs.Add(song); 
             await _DBContext.SaveChangesAsync(); 
 
             // HTTP Response?
@@ -97,13 +97,13 @@ namespace web_api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSong(int id)
         {
-            var song = await _DBContext.Song.FindAsync(id);
+            var song = await _DBContext.Songs.FindAsync(id);
             if (song == null)
             {
                 return NotFound();
             }
 
-            _DBContext.Song.Remove(song);
+            _DBContext.Songs.Remove(song);
             await _DBContext.SaveChangesAsync();
 
             return NoContent();
@@ -111,7 +111,7 @@ namespace web_api.Controllers
 
         private bool SongExists(int id)
         {
-            return _DBContext.Song.Any(e => e.Id == id);
+            return _DBContext.Songs.Any(e => e.Id == id);
         }
     }
 }

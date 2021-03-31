@@ -14,9 +14,9 @@ namespace web_api.Data
                 var context = serviceScope.ServiceProvider.GetService<AppDBContext>();
 
                 // If database is empty, seed it with initial data. 
-                if (!context.Song.Any())
+                if (!context.Songs.Any())
                 {
-                    context.Song.AddRange(
+                    context.Songs.AddRange(
                     new Song {
                         Title = "Back In Black",
                         ReleaseDate = new System.DateTime(1980, 7, 25),
