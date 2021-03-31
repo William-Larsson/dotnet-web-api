@@ -10,7 +10,9 @@ using web_api.Models;
 
 namespace web_api.Controllers
 {
-    [Route("api/[controller]")]
+    // Used to receive HTTP Requests and to respond to the
+    // request with an HTTP Response. 
+    [Route("api/[controller]")] // The URI to the controller
     [ApiController]
     public class SongController : ControllerBase
     {
@@ -23,6 +25,7 @@ namespace web_api.Controllers
         }
 
         // GET: api/Song
+        // Returns all the songs from the DB by HTTP Get.
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Song>>> GetSong()
         {
@@ -30,6 +33,7 @@ namespace web_api.Controllers
         }
 
         // GET: api/Song/5
+        // Returns a single song by the given Id by HTTP Get.  
         [HttpGet("{id}")]
         public async Task<ActionResult<Song>> GetSong(int id)
         {
@@ -44,7 +48,8 @@ namespace web_api.Controllers
         }
 
         // PUT: api/Song/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Updates an existing book in the DB if exists. 
+        // The URI Id must match the Song-object Id. 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSong(int id, Song song)
         {
@@ -75,13 +80,16 @@ namespace web_api.Controllers
         }
 
         // POST: api/Song
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // Will add a new song to the database. 
+        // When creating a Song-object, the Id prop should be set 
+        // to 0 or left as null. 
         [HttpPost]
         public async Task<ActionResult<Song>> PostSong(Song song)
         {
-            _DBContext.Song.Add(song);
-            await _DBContext.SaveChangesAsync();
+            _DBContext.Song.Add(song); 
+            await _DBContext.SaveChangesAsync(); 
 
+            // HTTP Response?
             return CreatedAtAction("GetSong", new { id = song.Id }, song);
         }
 
