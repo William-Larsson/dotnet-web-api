@@ -19,19 +19,16 @@ namespace web_api.Data
                     context.Song.AddRange(
                     new Song {
                         Title = "Back In Black",
-                        Artist = "AC/DC",
                         ReleaseDate = new System.DateTime(1980, 7, 25),
                         Genre = "Hard Rock"
                     },
                     new Song {
                         Title = "Wow.",
-                        Artist = "Post Malone",
                         ReleaseDate = new System.DateTime(2018, 12, 24),
                         Genre = "Hip Hop"
                     },
                     new Song {
                         Title = "You Make Me",
-                        Artist = "Avicii",
                         ReleaseDate = new System.DateTime(2013, 8, 30),
                         Genre = "EDM"
                     });

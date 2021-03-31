@@ -9,7 +9,7 @@ using web_api.Data;
 namespace web_api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20210330165412_InitialCreate")]
+    [Migration("20210331115003_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,17 +18,31 @@ namespace web_api.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.4");
 
+            modelBuilder.Entity("web_api.Models.Publisher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Publisher");
+                });
+
             modelBuilder.Entity("web_api.Models.Song", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Artist")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Genre")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("PublisherId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("TEXT");
@@ -38,7 +52,23 @@ namespace web_api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PublisherId");
+
                     b.ToTable("Song");
+                });
+
+            modelBuilder.Entity("web_api.Models.Song", b =>
+                {
+                    b.HasOne("web_api.Models.Publisher", "Publisher")
+                        .WithMany("Songs")
+                        .HasForeignKey("PublisherId");
+
+                    b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("web_api.Models.Publisher", b =>
+                {
+                    b.Navigation("Songs");
                 });
 #pragma warning restore 612, 618
         }
