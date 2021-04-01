@@ -107,18 +107,6 @@ namespace web_api.Controllers
             await _DBContext.SaveChangesAsync();
 
             return NoContent();
-
-            // From tutorial, I think the scaffolded code is fine as is
-            // var _publisher = await _DBContext.Publishers
-            //     .FirstOrDefaultAsync(pub => pub.Id == id);
-
-            // if (_publisher != null)
-            // {
-            //     _DBContext.Remove(_publisher);
-            //     await _DBContext.SaveChangesAsync();
-            // }
-
-            // return NoContent();
         }
 
         private bool PublisherExists(int id)

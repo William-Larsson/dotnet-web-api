@@ -9,8 +9,8 @@ using web_api.Data;
 namespace web_api.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20210331121338_ManyToManyAdded")]
-    partial class ManyToManyAdded
+    [Migration("20210401062754_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,7 +55,7 @@ namespace web_api.Migrations
                     b.Property<string>("Genre")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PublisherId")
+                    b.Property<int>("PublisherId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ReleaseDate")
@@ -96,7 +96,9 @@ namespace web_api.Migrations
                 {
                     b.HasOne("web_api.Models.Publisher", "Publisher")
                         .WithMany("Songs")
-                        .HasForeignKey("PublisherId");
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Publisher");
                 });

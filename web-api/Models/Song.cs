@@ -18,7 +18,7 @@ namespace web_api.Models
         // Used to define the relationship between models.E
         // A song has a single (or no) publisher, as well 
         // as one or many artist. 
-        public int? PublisherId { get; set; }  // Foreign key (optional, songs can have no publisher)
+        public int PublisherId { get; set; }  // Foreign key
         public Publisher Publisher { get; set; }
         public List<Song_Artist> Song_Artists { get; set; }
     }

@@ -17,7 +17,7 @@ namespace web_api.Models
         public string Genre { get; set; }
 
         // Will be mapped to Navigation props in the real Entities.
-        public int? PublisherId { get; set; } 
+        public int PublisherId { get; set; } 
         public List<int> ArtistsIds { get; set; }
 
     }

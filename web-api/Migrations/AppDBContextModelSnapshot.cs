@@ -53,7 +53,7 @@ namespace web_api.Migrations
                     b.Property<string>("Genre")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PublisherId")
+                    b.Property<int>("PublisherId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ReleaseDate")
@@ -94,7 +94,9 @@ namespace web_api.Migrations
                 {
                     b.HasOne("web_api.Models.Publisher", "Publisher")
                         .WithMany("Songs")
-                        .HasForeignKey("PublisherId");
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Publisher");
                 });
