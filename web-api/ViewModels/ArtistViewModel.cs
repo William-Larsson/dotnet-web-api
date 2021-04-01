@@ -14,6 +14,7 @@ namespace web_api.Models
 
     public class ArtistWithSongs
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public List<string> SongTitles { get; set; }
 

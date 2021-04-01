@@ -22,12 +22,26 @@ namespace web_api.Controllers
         }
 
         // GET: api/Artist
-        // [HttpGet]
-        // public async Task<ActionResult<IEnumerable<Artist>>> GetArtists()
-        // {
-        //     // TODO: does not return the publisher name and artist names
-        //     return await _DBContext.Artists.ToListAsync();
-        // }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ArtistWithSongs>>> GetArtists()
+        {
+            var _artists = await _DBContext.Artists.ToListAsync();
+            var _artistWithSongs = new List<ArtistWithSongs>();
+
+            foreach (var artist in _artists)
+            {
+                _artistWithSongs.Add(await _DBContext.Artists
+                    .Where(n => n.Id == artist.Id).Select(artist => new ArtistWithSongs()
+                    {
+                        Id = artist.Id,
+                        Name = artist.Name,
+                        SongTitles = artist.Song_Artists.Select(n => n.Song.Title).ToList()
+                    }).FirstOrDefaultAsync()
+                );
+            }
+
+            return _artistWithSongs;
+        }
 
         // GET: api/Artist/5
         [HttpGet("{id}")]
@@ -36,6 +50,7 @@ namespace web_api.Controllers
             var _artist = await _DBContext.Artists
                 .Where(n => n.Id == id).Select(artist => new ArtistWithSongs()
                 {
+                    Id = artist.Id,
                     Name = artist.Name,
                     SongTitles = artist.Song_Artists.Select(n => n.Song.Title).ToList()
                 }).FirstOrDefaultAsync();
@@ -44,38 +59,36 @@ namespace web_api.Controllers
         }
 
         // PUT: api/Artist/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutArtist(int id, Artist artist)
-        // {
-        //     if (id != artist.Id)
-        //     {
-        //         return BadRequest();
-        //     }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutArtist(int id, ArtistViewModel artistVM)
+        {
+            var _artist = new Artist(){
+                Id = id,
+                Name = artistVM.Name
+            };
 
-        //     _DBContext.Entry(artist).State = EntityState.Modified;
+            _DBContext.Entry(_artist).State = EntityState.Modified;
 
-        //     try
-        //     {
-        //         await _DBContext.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!ArtistExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
+            try
+            {
+                await _DBContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ArtistExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
 
         // POST: api/Artist
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Artist>> PostArtist([FromBody] ArtistViewModel artistVM)
         {

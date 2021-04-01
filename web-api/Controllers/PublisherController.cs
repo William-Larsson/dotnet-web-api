@@ -21,12 +21,33 @@ namespace web_api.Controllers
             _DBContext = context;
         }
 
-        // GET: api/Publisher
-        // [HttpGet]
-        // public async Task<ActionResult<IEnumerable<Publisher>>> GetPublishers()
-        // {
-        //     return await _DBContext.Publishers.ToListAsync();
-        // }
+        //GET: api/Publisher
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PublisherWithSongsAndArtists>>> GetPublishers()
+        {
+            var _publishers = await _DBContext.Publishers.ToListAsync();
+            var _pubWithSongsAndArtist = new List<PublisherWithSongsAndArtists>();
+
+            foreach (var pub in _publishers)
+            {
+                _pubWithSongsAndArtist.Add(await _DBContext.Publishers
+                    .Where(p => p.Id == pub.Id).Select(pub => new PublisherWithSongsAndArtists()
+                    {
+                        Id = pub.Id,
+                        Name = pub.Name,
+                        SongArtists = pub.Songs.Select(song => new SongArtistViewModel()
+                        {
+                            Id = song.Id,
+                            SongName = song.Title,
+                            SongArtists = song.Song_Artists.Select(sa => sa.Artist.Name).ToList()
+                        }).ToList()
+                    }).FirstOrDefaultAsync()
+                );
+            }
+
+            return _pubWithSongsAndArtist;
+        }
+
 
         // GET: api/Publisher/5
         [HttpGet("{id}")]
@@ -35,9 +56,11 @@ namespace web_api.Controllers
             var _publisherData = await _DBContext.Publishers
                 .Where(p => p.Id == id).Select(pub => new PublisherWithSongsAndArtists()
                 {
+                    Id = pub.Id,
                     Name = pub.Name,
                     SongArtists = pub.Songs.Select(song => new SongArtistViewModel()
                     {
+                        Id = song.Id,
                         SongName = song.Title,
                         SongArtists = song.Song_Artists.Select(sa => sa.Artist.Name).ToList()
                     }).ToList()
@@ -47,38 +70,38 @@ namespace web_api.Controllers
         }
 
         // PUT: api/Publisher/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutPublisher(int id, Publisher publisher)
-        // {
-        //     if (id != publisher.Id)
-        //     {
-        //         return BadRequest();
-        //     }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPublisher(int id, PublisherViewModel publisherVM)
+        {
+            var _publisher = new Publisher()
+            {
+                Id = id,
+                Name = publisherVM.Name
+            };
 
-        //     _DBContext.Entry(publisher).State = EntityState.Modified;
 
-        //     try
-        //     {
-        //         await _DBContext.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!PublisherExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
+            _DBContext.Entry(_publisher).State = EntityState.Modified;
 
-        //     return NoContent();
-        // }
+            try
+            {
+                await _DBContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PublisherExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
 
         // POST: api/Publisher
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Publisher>> PostPublisher([FromBody] PublisherViewModel publisherVM)
         {

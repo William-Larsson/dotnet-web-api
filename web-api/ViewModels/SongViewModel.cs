@@ -24,6 +24,7 @@ namespace web_api.Models
 
      public class SongWithArtists
     {
+        public int Id { get; set; }
         public string Title { get; set; }
 
         [DataType(DataType.Date)]

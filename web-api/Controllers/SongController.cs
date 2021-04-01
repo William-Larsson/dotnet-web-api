@@ -26,12 +26,29 @@ namespace web_api.Controllers
 
         // GET: api/Song
         // Returns all the songs from the DB by HTTP Get.
-        // [HttpGet]
-        // public async Task<ActionResult<IEnumerable<Song>>> GetSong()
-        // {
-        //     // TODO: does not return the publisher name and artist names
-        //     return await _DBContext.Songs.ToListAsync();
-        // }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<SongWithArtists>>> GetSong()
+        {
+            var _songs = await _DBContext.Songs.ToListAsync();
+            var _songsWithArtists = new List<SongWithArtists>();
+
+            foreach (var song in _songs)
+            {
+                _songsWithArtists.Add(await _DBContext.Songs
+                        .Where(n => n.Id == song.Id).Select(song => new SongWithArtists()
+                    {
+                        Id = song.Id,
+                        Title = song.Title,
+                        ReleaseDate = song.ReleaseDate,
+                        Genre = song.Genre,
+                        PublisherName = song.Publisher.Name,
+                        ArtistNames = song.Song_Artists.Select(n => n.Artist.Name).ToList()
+                    }).FirstOrDefaultAsync()
+                );
+            }
+
+            return _songsWithArtists;
+        }
 
         // GET: api/Song/5
         // Returns a single song by the given id by HTTP Get.  
@@ -41,6 +58,7 @@ namespace web_api.Controllers
             var _songWithArtist = await _DBContext.Songs
                 .Where(n => n.Id == id).Select(song => new SongWithArtists()
             {
+                Id = song.Id,
                 Title = song.Title,
                 ReleaseDate = song.ReleaseDate,
                 Genre = song.Genre,
@@ -54,39 +72,12 @@ namespace web_api.Controllers
         // PUT: api/Song/5
         // Updates an existing book in the DB if exists. 
         // The URI Id must match the Song-object Id. 
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> PutSong(int id, [FromBody] SongViewModel songVM)
-        // {
-        //     var _song = new Song()
-        //     {
-        //         Title = songVM.Title,
-        //         ReleaseDate = songVM.ReleaseDate,
-        //         Genre = songVM.Genre,
-        //         PublisherId = songVM.PublisherId
-        //     };
-
-        //     // TODO: What about the Artists IDs ??  
-
-        //     _DBContext.Entry(_song).State = EntityState.Modified;
-
-        //     try
-        //     {
-        //         await _DBContext.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         if (!SongExists(id))
-        //         {
-        //             return NotFound();
-        //         }
-        //         else
-        //         {
-        //             throw;
-        //         }
-        //     }
-
-        //     return NoContent();
-        // }
+        [HttpPut("{id}")]
+        public Task<IActionResult> PutSong(int id, [FromBody] SongViewModel songVM)
+        {
+            // If I figure out how to implement this method, add "async" to declaration.
+            throw new NotImplementedException();
+        }
 
         // POST: api/Song
         // Will add a new song to the database. 
