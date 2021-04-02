@@ -11,9 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-
+//Added by me for this project:
 using web_api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace web_api
 {
@@ -29,6 +30,15 @@ namespace web_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configure JwtBearer Authentication
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt => 
+                {
+                    // Audience, who has access?
+                    opt.Audience = Configuration["AzureActiveDirectory:ResourceId"]; // Found in appsettings.json
+                    // Authority, who can issue the web tokens on our behalf?
+                    opt.Authority = $"{Configuration["AzureActiveDirectory:InstanceId"]}{Configuration["AzureActiveDirectory:TenantId"]}";
+                });
 
             services.AddControllers();
 
@@ -41,7 +51,6 @@ namespace web_api
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
-
 
             services.AddSwaggerGen(c =>
             {
@@ -63,6 +72,7 @@ namespace web_api
 
             app.UseRouting();
 
+            app.UseAuthentication(); // Needed for Azure Active Directory. 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
