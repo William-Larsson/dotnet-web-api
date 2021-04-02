@@ -32,12 +32,12 @@ namespace web_api
         {
             // Configure JwtBearer Authentication
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt => 
+                .AddJwtBearer(opt =>
                 {
                     // Audience, who has access?
-                    opt.Audience = Configuration["AzureActiveDirectory:ResourceId"]; // Found in appsettings.json
-                    // Authority, who can issue the web tokens on our behalf?
-                    opt.Authority = $"{Configuration["AzureActiveDirectory:InstanceId"]}{Configuration["AzureActiveDirectory:TenantId"]}";
+                    opt.Audience = Configuration["AzureActiveDirectory:ResourceId"];
+                     // Authority, who can issue the web tokens on our behalf?
+                    opt.Authority = $"{Configuration["AzureActiveDirectory:Instance"]}{Configuration["AzureActiveDirectory:TenantId"]}";
                 });
 
             services.AddControllers();
