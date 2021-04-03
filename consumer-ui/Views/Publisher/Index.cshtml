@@ -1,0 +1,45 @@
+@model IEnumerable<consumer_ui.Models.PublisherDetail>
+@{
+    ViewData["Title"] = "Publisher Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>HTTP-Get all Publishers:</h1>
+
+<div>
+    <a asp-action="Insert" class="btn btn-primary">Insert new Publisher</a>
+</div>
+
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            </th>
+            <th>CRUD-operations</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

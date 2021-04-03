@@ -18,8 +18,8 @@ namespace consumer_ui
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Trying to get access from Azure...");
-            RunAsync().GetAwaiter().GetResult();
+            //Console.WriteLine("Trying to get access from Azure...");
+            //RunAsync().GetAwaiter().GetResult();
 
             // default code:
             CreateHostBuilder(args).Build().Run();
@@ -37,16 +37,16 @@ namespace consumer_ui
         // get an access token for the web api. 
         private static async Task RunAsync()
         {
-            AuthConfig config = AuthConfig.ReadFromJsonFile("authsettings.json");
+            AuthConfig authConfig = AuthConfig.ReadFromJsonFile("authsettings.json");
 
             IConfidentialClientApplication app;
 
-            app = ConfidentialClientApplicationBuilder.Create(config.ClientId)
-                .WithClientSecret(config.ClientSecret)
-                .WithAuthority(new Uri(config.Authority))
+            app = ConfidentialClientApplicationBuilder.Create(authConfig.ClientId)
+                .WithClientSecret(authConfig.ClientSecret)
+                .WithAuthority(new Uri(authConfig.Authority))
                 .Build();
 
-            string[] ResourceIds = new string[] { config.ResourceId };
+            string[] ResourceIds = new string[] { authConfig.ResourceId };
 
             AuthenticationResult result = null;
             try
@@ -72,7 +72,7 @@ namespace consumer_ui
 
                 // Pass the handler to httpclient(from you are calling api)
                 HttpClient httpClient = new HttpClient(clientHandler);      
-                var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
+                HttpRequestHeaders defaultRequestHeaders = httpClient.DefaultRequestHeaders;
 
                 if (defaultRequestHeaders.Accept == null ||
                    !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
@@ -85,10 +85,10 @@ namespace consumer_ui
                 // Sets authorization to "bearer" and pass the access token
                 // to the request header
                 defaultRequestHeaders.Authorization =
-                  new AuthenticationHeaderValue("bearer", result.AccessToken);
+                    new AuthenticationHeaderValue("bearer", result.AccessToken);
 
                 // Call the "base"-address, the address of the api
-                HttpResponseMessage response = await httpClient.GetAsync(config.BaseAddress);
+                HttpResponseMessage response = await httpClient.GetAsync(authConfig.BaseAddress + "/api/Publisher");
 
                 if (response.IsSuccessStatusCode)
                 {
