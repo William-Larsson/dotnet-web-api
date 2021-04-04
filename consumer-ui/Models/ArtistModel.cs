@@ -1,18 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace consumer_ui.Models
 {
+    // Model-class for the Artist controller.
+    // Is used to make API calls related to the API-operations
+    // for the endpoint in [API-URI]/api/Artist. 
     public class ArtistModel
     {
-        // TODO: in this class, make operations for HTTP Get, put, post, delete
-        // Example: see assignment 3 from previous course and the relation between the classes of the same name 
-        // connect (maybe) to ArtistDetail, ArtistController and AuthHandler (?)
-
         private AuthHandler authHandler;
         private HttpClient httpClient;
 
@@ -30,11 +31,12 @@ namespace consumer_ui.Models
         }
 
         // For getting a all artists from API. 
-        // Uses API GET. 
-        // TODO: returntype?
-        public async void Get()
+        // Uses API GET
+        // Returns list of ArtistDetails, parsed from json response. 
+        public async Task<List<ArtistDetail>> Get()
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
+            List<ArtistDetail> artistList = null;
 
             if (!string.IsNullOrEmpty(accessResult.AccessToken))
             {
@@ -43,29 +45,27 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response ArtistModel Get():");
-                    Console.WriteLine(json + "\n");
+                    artistList = JsonConvert
+                        .DeserializeObject<IEnumerable<ArtistDetail>>(json).ToList();;
                 } 
-                else
+                else // Prints failed respons for debugging
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor(); 
                 }
-                Console.ResetColor();
             }
 
-            // TODO: Return the result in some way!!
+            return artistList; 
         }
 
 
         // Makes a HTTP Post to insert a new artist into the API. 
         // Only uses the artistDetail name for request. 
-        public async void Insert(ArtistDetail artistDetail)
+        public async Task Insert(ArtistDetail artistDetail)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -84,11 +84,7 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response ArtistModel Insert():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -100,13 +96,13 @@ namespace consumer_ui.Models
                 Console.ResetColor();
             }
 
-            // TODO: Return the result in some way?
+            // TODO: Return the result (json or as an object) in some way?
         }
 
         // Makes a HTTP Put to update an existsing artist into the API. 
         // Only uses the artistDetail name for request, but uses Id 
         // to point to the correct API resource. 
-        public async void Update(ArtistDetail artistDetail)
+        public async Task Update(ArtistDetail artistDetail)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -125,11 +121,7 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response ArtistModel Update():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -146,7 +138,7 @@ namespace consumer_ui.Models
 
         // Makes a HTTP Delete to remove an existsing artist from the API. 
         // Only uses the Id to point to the correct API resource. 
-        public async void Delete(ArtistDetail artistDetail)
+        public async Task Delete(int id)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -154,15 +146,11 @@ namespace consumer_ui.Models
             {
                 // Call the API from its base address (set in the http client) + API-endpoint
                 HttpResponseMessage response = await httpClient
-                    .DeleteAsync($"/api/Artist/{artistDetail.Id}");
+                    .DeleteAsync($"/api/Artist/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response ArtistModel Delete():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {

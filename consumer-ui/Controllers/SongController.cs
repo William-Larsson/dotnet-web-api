@@ -13,7 +13,7 @@ namespace consumer_ui.Controllers
     {
         AuthHandler authHandler = new AuthHandler();
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             SongModel SongModel = new SongModel(); // TODO: Use this class to do HTTP Get, put, post, delete
 

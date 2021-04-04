@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using consumer_ui.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace consumer_ui.Controllers
@@ -12,7 +13,7 @@ namespace consumer_ui.Controllers
     {
         AuthHandler authHandler = new AuthHandler();
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             // TODO: Continue here
             List<PublisherDetail> publisherList = new List<PublisherDetail>();
