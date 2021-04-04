@@ -7,38 +7,33 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace consumer_ui.Controllers
 {
+    [Authorize] // Only logged-in user can access these pages. 
     public class PublisherController : Controller
     {
         AuthHandler authHandler = new AuthHandler();
 
         public async Task<IActionResult> Index()
         {
-             // TODO: Move to the ArtistModel.cs class
-            HttpClient httpClient = authHandler.httpClient;
-            HttpResponseMessage response = await httpClient.GetAsync("/api/Publisher");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Artist Get from Controller: \n" + result);
-            }
-            else
-            {
-                Console.WriteLine("HTTP Response is not a success");
-            }
-
-
             // TODO: Continue here
-            List<PublisherDetail> artistList = new List<PublisherDetail>();
-            PublisherModel artist = new PublisherModel(); // TODO: Use this class to do HTTP Get, put, post, delete
+            List<PublisherDetail> publisherList = new List<PublisherDetail>();
+            PublisherModel publisherModel = new PublisherModel(); // TODO: Use this class to do HTTP Get, put, post, delete
 
-            artistList.Add(new PublisherDetail()
+            var publisherDetail = new PublisherDetail()
             {
-                Id = 1,
-                Name = "Testing Publisher"
-            });
+                Id = 9,
+                Name = "Testing Publisher Update"
+            };
 
-            return View(artistList);
+            publisherList.Add(publisherDetail);
+
+
+            publisherModel.Get(); // OK
+            //publisherModel.Insert(publisherDetail); // OK
+            //publisherModel.Update(publisherDetail); // OK
+            //publisherModel.Delete(publisherDetail); // OK
+
+
+            return View(publisherList);
         }
     }
 }

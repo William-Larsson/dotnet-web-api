@@ -39,6 +39,7 @@ namespace consumer_ui
         }
 
         // Makes a request to gain a token for accessing the web api. 
+        // If something goes wrong or access is denied, nothing is returned
         public async Task<AuthenticationResult> AcquireAccessToken()
         {
             AuthenticationResult result = null;

@@ -24,7 +24,6 @@ namespace consumer_ui.Controllers
             return View();
         }
 
-        [Authorize]
         public IActionResult Privacy()
         {
             return View();
