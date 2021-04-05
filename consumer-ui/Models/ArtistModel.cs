@@ -47,7 +47,7 @@ namespace consumer_ui.Models
                 {
                     string json = await response.Content.ReadAsStringAsync();
                     artistList = JsonConvert
-                        .DeserializeObject<IEnumerable<ArtistDetail>>(json).ToList();;
+                        .DeserializeObject<IEnumerable<ArtistDetail>>(json).ToList();
                 } 
                 else // Prints failed respons for debugging
                 {

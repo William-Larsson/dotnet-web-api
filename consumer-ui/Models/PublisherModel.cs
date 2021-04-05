@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace consumer_ui.Models
@@ -28,9 +32,10 @@ namespace consumer_ui.Models
 
         // For getting a all publishers from API. 
         // Uses API GET. 
-        public async void Get()
+        public async Task<List<PublisherDetail>> Get()
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
+            List<PublisherDetail> publisherList = null;
 
             if (!string.IsNullOrEmpty(accessResult.AccessToken))
             {
@@ -39,11 +44,9 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response PublisherModel Get():");
-                    Console.WriteLine(json + "\n");
+                    publisherList = JsonConvert
+                        .DeserializeObject<IEnumerable<PublisherDetail>>(json).ToList();
                 } 
                 else
                 {
@@ -55,13 +58,13 @@ namespace consumer_ui.Models
                 Console.ResetColor();
             }
 
-            // TODO: Return the result in some way!!
+            return publisherList;
         }
 
 
         // Makes a HTTP Post to insert a new Publisher into the API. 
         // Only uses the PublisherDetail name for request. 
-        public async void Insert(PublisherDetail PublisherDetail)
+        public async Task Insert(PublisherDetail PublisherDetail)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -80,11 +83,7 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response PublisherModel Insert():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -92,17 +91,17 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
-            // TODO: Return the result in some way?
+            // TODO: Return the result (json or as an object) in some way?
         }
 
         // Makes a HTTP Put to update an existsing Publisher into the API. 
         // Only uses the PublisherDetail name for request, but uses Id 
         // to point to the correct API resource. 
-        public async void Update(PublisherDetail PublisherDetail)
+        public async Task Update(PublisherDetail PublisherDetail)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -121,11 +120,7 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response PublisherModel Update():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -133,8 +128,8 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
              // TODO: Return the result in some way?
@@ -142,7 +137,7 @@ namespace consumer_ui.Models
 
         // Makes a HTTP Delete to remove an existsing Publisher from the API. 
         // Only uses the Id to point to the correct API resource. 
-        public async void Delete(PublisherDetail PublisherDetail)
+        public async Task Delete(int id)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -150,15 +145,11 @@ namespace consumer_ui.Models
             {
                 // Call the API from its base address (set in the http client) + API-endpoint
                 HttpResponseMessage response = await httpClient
-                    .DeleteAsync($"/api/Publisher/{PublisherDetail.Id}");
+                    .DeleteAsync($"/api/Publisher/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response PublisherModel Delete():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -166,12 +157,11 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
              // TODO: Return the result in some way?
         }
-    
     }
 }

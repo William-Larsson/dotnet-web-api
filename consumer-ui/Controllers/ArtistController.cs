@@ -23,7 +23,6 @@ namespace consumer_ui.Controllers
             return View(artistList);
         }
 
-
         // Loads the Insert.cshtml-file. 
         // This does NOT Insert an entry. Only displays the editor page
         [HttpGet]
@@ -32,10 +31,14 @@ namespace consumer_ui.Controllers
             return View();
         }
 
-
+        // Called when submitting the form on the Insert.cshtml page
+        // If the user input is not empty or null, insert the new 
+        // Artist with HTTP Put thorugh the model. 
         [HttpPost]
         public async Task<IActionResult> Insert([FromForm] ArtistDetail formData)
         {
+            // NOTE! This could have been made simpler with
+            // ModelState.IsValid() (see SongController Insert.)
             if (String.IsNullOrEmpty(formData.Name))
             {
                 ViewBag.incorrectName = "* Cannot be empty";
@@ -47,7 +50,6 @@ namespace consumer_ui.Controllers
                 return RedirectToAction("Index", "Artist");
             }
         }
-
 
         // Loads the Edit.cshtml-page for an artist
         // of a specific Id, for example provided by the @Actionlink 

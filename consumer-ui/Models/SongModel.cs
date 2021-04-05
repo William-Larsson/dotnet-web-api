@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace consumer_ui.Models
 {
@@ -29,10 +32,10 @@ namespace consumer_ui.Models
 
         // For getting a all Songs from API. 
         // Uses API GET. 
-        // TODO: returntype?
-        public async void Get()
+        public async Task<List<SongDetail>> Get()
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
+            List<SongDetail> songList = null;
 
             if (!string.IsNullOrEmpty(accessResult.AccessToken))
             {
@@ -41,11 +44,9 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response SongModel Get():");
-                    Console.WriteLine(json + "\n");
+                    songList = JsonConvert
+                        .DeserializeObject<IEnumerable<SongDetail>>(json).ToList();
                 } 
                 else
                 {
@@ -53,17 +54,17 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
-            // TODO: Return the result in some way!!
+            return songList;
         }
 
 
         // Makes a HTTP Post to insert a new Song into the API. 
         // Only uses the SongDetail name for request. 
-        public async void Insert(SongDetail SongDetail)
+        public async Task Insert(SongDetail SongDetail)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -80,6 +81,7 @@ namespace consumer_ui.Models
                         artistsIds = SongDetail.ArtistIds
                     });
                 
+                //TODO: Remove
                 Console.WriteLine("The SONG POST JSON \n" + tempJson);
 
                 var jsonContent = new StringContent(tempJson,
@@ -92,9 +94,10 @@ namespace consumer_ui.Models
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
 
+                    //TODO: Remove
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("HTTP response SongModel Insert():");
                     Console.WriteLine(json + "\n");
                 } 

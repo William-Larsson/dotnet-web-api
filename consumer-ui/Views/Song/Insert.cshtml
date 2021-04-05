@@ -1,0 +1,60 @@
+@model consumer_ui.Models.SongDetail
+
+@{
+    ViewData["Title"] = "Insert";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Insert new Song</h1>
+
+<h4>Song Detail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Insert">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReleaseDate" class="control-label"></label>
+                <input asp-for="ReleaseDate" class="form-control" />
+                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Genre" class="control-label"></label>
+                <input asp-for="Genre" class="form-control" />
+                <span asp-validation-for="Genre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PublisherId" class="control-label"></label>
+                <input asp-for="PublisherId" class="form-control" />
+                <span asp-validation-for="PublisherId" class="text-danger"></span>
+                @if (ViewBag.incorrectPublisherId != "") {
+                    <span class="text-danger">@ViewBag.incorrectPublisherId</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="ArtistIds" class="control-label"></label>
+                <!--
+                    NOTE! This input will not be a part of SongDetail object,
+                    instead it will be passed as its own argument based on the 
+                    name "ArtistsIds" that matches the [HttpPost] Insert in controller.
+                -->
+                <input name="artistIdsString" class="form-control" value="@ViewBag.artistIdsString"/>
+                @if (ViewBag.incorrectIds != "") {
+                    <span class="text-danger">@ViewBag.incorrectIds</span>
+                }
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

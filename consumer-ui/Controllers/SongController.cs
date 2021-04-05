@@ -5,43 +5,134 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using consumer_ui.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace consumer_ui.Controllers
 {
     [Authorize] // Only logged-in user can access these pages. 
     public class SongController : Controller
     {
-        AuthHandler authHandler = new AuthHandler();
+        SongModel songModel = new SongModel();
 
-        public IActionResult Index()
+        // Loads the Index.cshtml-page of [URL]/Song with
+        // SongDetails fetched from Web API in the model-class.
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            SongModel SongModel = new SongModel(); // TODO: Use this class to do HTTP Get, put, post, delete
+            var songList = await songModel.Get(); 
+            return View(songList);
+        }
 
-            // TODO: Continue here
-            List<SongDetail> SongList = new List<SongDetail>();
+        // Loads the Insert.cshtml-file. 
+        // This does NOT Insert an entry. Only displays the editor page
+        [HttpGet]
+        public IActionResult Insert()
+        {
+            return View();
+        }
 
-            var artistIds = new List<int>();
-            artistIds.Add(6);
-           
-            var SongDetail = new SongDetail()
+        // Called when submitting the form on the Insert.cshtml page
+        // If the user input is not empty or null, insert the new 
+        // Song with HTTP Put thorugh the model. 
+        [HttpPost]
+        public async Task<IActionResult> Insert([FromForm] SongDetail formData, string artistIdsString)
+        {
+            var artistIds = this.ValidateArtistIds(artistIdsString).Result;
+            var publisherIsValid = this.ValidatePublisherId(formData.PublisherId).Result;
+
+            if (ModelState.IsValid && artistIds.isValid && publisherIsValid)
             {
-                Id = 14,
-                Title = "Testing Testing Testing",
-                ReleaseDate = DateTime.Now,
-                Genre = "Test Pop",
-                PublisherName = "TSTNG Studios",
-                PublisherId = 8,
-                ArtistNames = new List<string>(),
-                ArtistIds = artistIds
-            };
+                formData.ArtistIds = artistIds.artistIds;
+                await songModel.Insert(formData);
+                return RedirectToAction("Index", "Song");
+            }
 
-            SongList.Add(SongDetail);
+            if (!artistIds.isValid)
+            {
+                ViewBag.incorrectIds = "* Required. IDs must be space separated integer(s).";
+            }
 
-            SongModel.Get(); // OK
-            // SongModel.Insert(SongDetail); // OK
-            // SongModel.Delete(SongDetail); // OK
+            if (!publisherIsValid)
+            {
+                ViewBag.incorrectPublisherId = "* No publisher of that ID could be found.";
+            }
 
-            return View(SongList);
+            ViewBag.artistIdsString = artistIdsString;
+            return View(formData);
+
+        }
+
+        // Loads the Details.cshtml-page for a Song
+        // of a specific Id, for example provided by the @Actionlink 
+        // in Index.cshtml. Id is provided in the URI (Song/Details/{id}?...)
+        [HttpGet]
+        public IActionResult Details()
+        {
+            return View();
+        }
+
+        // Loads the Delete.cshtml-page for a song
+        // of a specific Id, for example provided by the @Actionlink 
+        // in Index.cshtml. Id is provided in the URI (Song/Delete/{id}?...)
+        // This does NOT delete the entry. Only displays the confirmation page
+        [HttpGet]
+        public IActionResult Delete()
+        {
+            return View();
+        }
+
+        // Called on Post, will use the SongModel to delete the entry
+        // from the API with the given ID, then redirect to Song start page. 
+        [HttpPost]
+        public async Task<IActionResult> Delete (int id)
+        {
+            return RedirectToAction("Index", "Song");
+        }
+
+        // Returns a tuple of (bool, List<int>).
+        // Fetches Artists from the API to compare input to. 
+        // If valid, the tuple with be (true, List<>)
+        // indicating that the IDs are valid, as well as
+        // returning a list of all the Artists IDs as int. 
+        private async Task<(bool isValid, List<int> artistIds)> ValidateArtistIds(string artistIdsString)
+        {
+            if (!String.IsNullOrEmpty(artistIdsString))
+            {
+                char[] delimiterChars = { ' ', ',', '-', ':', '\t', '\n' };
+                var idStrings = artistIdsString.Split(delimiterChars).ToList();
+
+                try
+                {   // Parsing can throw exception
+                    List<int> ids = idStrings.Select(id => Int32.Parse(id)).ToList();
+                    var artistModel = new ArtistModel();
+                    var artistList = await artistModel.Get(); 
+
+                    foreach (var id in ids)
+                    {
+                        if (!artistList.Any(artist => artist.Id == id))
+                            return (false, null);
+                    }
+                    return (true, ids.ToList());
+                }
+                catch (FormatException)
+                {
+                    return (false, null);
+                }
+            }
+            return (false, null);
+        }
+
+        // Fetches Publishers from the API to compare input to.
+        // If the selected publisher ID is valid, return true. 
+        private async Task<bool> ValidatePublisherId(int id)
+        {
+            var publisherModel = new PublisherModel();
+            var publishers = await publisherModel.Get();
+
+            if (publishers.Any(pub => pub.Id == id))
+                return true;
+            else
+                return false; 
         }
     }
 }

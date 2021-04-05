@@ -14,6 +14,7 @@ namespace consumer_ui.Models
 
         [DisplayName("Release date")]
         [Required(ErrorMessage = "* Required")]
+        [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
 
         [Required(ErrorMessage = "* Required")]
@@ -22,6 +23,9 @@ namespace consumer_ui.Models
         [DisplayName("Publisher name")]
         public string PublisherName { get; set; }
 
+        // NOTE! [Require] must still be complemented 
+        // with an API check to see if the publisherId
+        // is a real publisher.
         [DisplayName("Publisher ID")]
         [Required(ErrorMessage = "* Required")]
         public int PublisherId { get; set; }
@@ -29,8 +33,10 @@ namespace consumer_ui.Models
         [DisplayName("Artists")]
         public List<string> ArtistNames { get; set; }
 
+        // NOTE! Cannot automatically validate this input
+        // with [Required]m need to be implemented in the 
+        // controller. 
         [DisplayName("Artists ID's")]
-        [Required(ErrorMessage = "* Required")]
         public List<int> ArtistIds { get; set; }
         
     }
