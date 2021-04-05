@@ -80,9 +80,6 @@ namespace consumer_ui.Models
                         publisherId = SongDetail.PublisherId,
                         artistsIds = SongDetail.ArtistIds
                     });
-                
-                //TODO: Remove
-                Console.WriteLine("The SONG POST JSON \n" + tempJson);
 
                 var jsonContent = new StringContent(tempJson,
                     Encoding.UTF8, 
@@ -95,11 +92,6 @@ namespace consumer_ui.Models
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
-
-                    //TODO: Remove
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("HTTP response SongModel Insert():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -107,8 +99,8 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
             // TODO: Return the result in some way?
@@ -124,7 +116,7 @@ namespace consumer_ui.Models
 
         // Makes a HTTP Delete to remove an existsing Song from the API. 
         // Only uses the Id to point to the correct API resource. 
-        public async void Delete(SongDetail SongDetail)
+        public async Task Delete(int id)
         {
             var accessResult = authHandler.AcquireAccessToken().Result;
 
@@ -132,15 +124,11 @@ namespace consumer_ui.Models
             {
                 // Call the API from its base address (set in the http client) + API-endpoint
                 HttpResponseMessage response = await httpClient
-                    .DeleteAsync($"/api/Song/{SongDetail.Id}");
+                    .DeleteAsync($"/api/Song/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
                     string json = await response.Content.ReadAsStringAsync();
-
-                    Console.WriteLine("HTTP response SongModel Delete():");
-                    Console.WriteLine(json + "\n");
                 } 
                 else
                 {
@@ -148,8 +136,8 @@ namespace consumer_ui.Models
                     Console.WriteLine($"Failed to call the Web Api: {response.StatusCode}");
                     string content = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Content: {content}");
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
 
              // TODO: Return the result in some way?

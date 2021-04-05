@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using consumer_ui.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace consumer_ui.Controllers
 {
@@ -19,7 +20,8 @@ namespace consumer_ui.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var artistList = await artistModel.Get(); 
+            var artistList = await artistModel.Get();
+            artistList = artistList.OrderBy(artist => artist.Name).ToList(); 
             return View(artistList);
         }
 

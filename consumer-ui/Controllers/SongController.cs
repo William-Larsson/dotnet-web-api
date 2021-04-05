@@ -20,6 +20,7 @@ namespace consumer_ui.Controllers
         public async Task<IActionResult> Index()
         {
             var songList = await songModel.Get(); 
+            songList = songList.OrderBy(song => song.ReleaseDate).ToList();
             return View(songList);
         }
 
@@ -66,9 +67,17 @@ namespace consumer_ui.Controllers
         // of a specific Id, for example provided by the @Actionlink 
         // in Index.cshtml. Id is provided in the URI (Song/Details/{id}?...)
         [HttpGet]
-        public IActionResult Details()
+        public IActionResult Details(int id, string title, DateTime relDate, string genre, string pubName, List<string> artistNames)
         {
-            return View();
+            return View(new SongDetail()
+            {
+                Id = id,
+                Title = title,
+                ReleaseDate = relDate,
+                Genre = genre,
+                PublisherName = pubName,
+                ArtistNames = artistNames
+            });
         }
 
         // Loads the Delete.cshtml-page for a song
@@ -76,9 +85,17 @@ namespace consumer_ui.Controllers
         // in Index.cshtml. Id is provided in the URI (Song/Delete/{id}?...)
         // This does NOT delete the entry. Only displays the confirmation page
         [HttpGet]
-        public IActionResult Delete()
+        public IActionResult Delete(int id, string title, DateTime relDate, string genre, string pubName, List<string> artistNames)
         {
-            return View();
+            return View(new SongDetail()
+            {
+                Id = id,
+                Title = title,
+                ReleaseDate = relDate,
+                Genre = genre,
+                PublisherName = pubName,
+                ArtistNames = artistNames
+            });
         }
 
         // Called on Post, will use the SongModel to delete the entry
@@ -86,6 +103,7 @@ namespace consumer_ui.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete (int id)
         {
+            await songModel.Delete(id);
             return RedirectToAction("Index", "Song");
         }
 

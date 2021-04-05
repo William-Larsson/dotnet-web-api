@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using consumer_ui.Models;
@@ -19,6 +20,7 @@ namespace consumer_ui.Controllers
         public async Task<IActionResult> Index()
         {
             var publisherList = await publisherModel.Get(); 
+            publisherList = publisherList.OrderByDescending(pub => pub.Name).ToList();
             return View(publisherList);
         }
 
